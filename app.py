@@ -40,11 +40,52 @@ def create_response(
 ~~~~~~~~~~~~ API ~~~~~~~~~~~~
 """
 
-
 @app.route("/")
 def hello_world():
     return create_response({"content": "hello world!"})
 
+@app.route("/users/all")
+def allUsers():
+    return create_response({"users": db.get('users')})
+
+@app.route('/users/<id>')
+def userById(id):
+    ans=db.getById("users",int(id))
+    if ans is None:
+        return create_response(status=404,message="There is no user with such an id")
+    return create_response({"user":ans})
+
+@app.route("/users")
+def byTeam():
+    team=request.args.get('team')
+    users=[i for i in db.get("users") if i["team"] == team]
+    if users == []:
+        return create_response(status=404,message="There is no users in this team!")
+    return create_response({"users":users})
+
+@app.route("/users",methods=['POST'])
+def newUser():
+    body=request.json
+    for i in db.userBase:
+        if i not in body:
+            return create_response(status=422,message="The field "+i+" is required!!")
+    ans=db.create("users",body)
+    return create_response({"new user":ans},status=201,message=ans["name"]+ " added!")
+
+@app.route("/users/<id>",methods=['PUT'])
+def update(id):
+    fields=request.json
+    ans=db.updateById("users",int(id),fields)
+    if ans is None:
+        return create_response(status=404,message="The id "+id+" is not defined!")
+    return create_response({"update user": ans})
+
+@app.route("/users/<id>",methods=['DELETE'])
+def delete(id):
+    if db.getById("users",int(id)) is None:
+        return create_response(status=404,message="The id "+id+" is not defined!")
+    db.deleteById("users",int(id))
+    return create_response(message="The user deleted successfully!")
 
 @app.route("/mirror/<name>")
 def mirror(name):

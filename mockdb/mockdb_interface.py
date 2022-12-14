@@ -2,7 +2,9 @@ from mockdb.dummy_data import initial_db_state
 import json
 
 db_state = initial_db_state
-
+userBase={
+    "name","age","team"
+}
 
 def get(type):
     return db_state[type]
