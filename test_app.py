@@ -43,20 +43,20 @@ def test_get_user_id(client):
     assert res_user["age"] == 19
 
 def test_post_new_user(client):
-    body={"name":"Avi","age":45,"team":"NNB"}
-    res=client.post("http://localhost:5000/users",json=body)
+    body = {"name": "Avi", "age":45, "team": "NNB"}
+    res = client.post("http://localhost:5000/users", json=body)
     assert res.status_code == 201
 
     res_user = res.json["result"]["new user"]
-    assert res_user["name"]==body["name"]
-    body = { "age": 45, "team": "NNB"}
+    assert res_user["name"] == body["name"]
+    body = {"age": 45, "team": "NNB"}
     res = client.post("http://localhost:5000/users", json=body)
     assert res.status_code == 422
 
 def test_put_user_id(client):
-    fields={"age":50}
-    res = client.put("http://localhost:5000/users/2",json=fields)
-    assert res.status_code==200
+    fields = {"age": 50}
+    res = client.put("http://localhost:5000/users/2", json=fields)
+    assert res.status_code == 200
     res_user = res.json["result"]["update user"]
     assert res_user["age"] == 50
 
