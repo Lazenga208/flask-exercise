@@ -2,6 +2,8 @@
 # pytest automatically injects fixtures
 # that are defined in conftest.py
 # in this case, client is injected
+
+
 def test_index(client):
     res = client.get("/")
     assert res.status_code == 200
@@ -15,7 +17,7 @@ def test_mirror(client):
 
 
 def test_get_users(client):
-    res = client.get("/users")
+    res = client.get("/users/all")
     assert res.status_code == 200
 
     res_users = res.json["result"]["users"]
@@ -39,3 +41,26 @@ def test_get_user_id(client):
     res_user = res.json["result"]["user"]
     assert res_user["name"] == "Aria"
     assert res_user["age"] == 19
+
+def test_post_new_user(client):
+    body={"name":"Avi","age":45,"team":"NNB"}
+    res=client.post("http://localhost:5000/users",json=body)
+    assert res.status_code == 201
+
+    res_user = res.json["result"]["new user"]
+    assert res_user["name"]==body["name"]
+    body = { "age": 45, "team": "NNB"}
+    res = client.post("http://localhost:5000/users", json=body)
+    assert res.status_code == 422
+
+def test_put_user_id(client):
+    fields={"age":50}
+    res = client.put("http://localhost:5000/users/2",json=fields)
+    assert res.status_code==200
+    res_user = res.json["result"]["update user"]
+    assert res_user["age"] == 50
+
+def test_delete_user_id(client):
+    res = client.delete("http://localhost:5000/users/2")
+    assert res.status_code == 200
+    assert res.json["message"] == "The user deleted successfully!"
